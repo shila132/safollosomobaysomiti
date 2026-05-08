@@ -1,0 +1,207 @@
+/* ----- CSS variables (premium dark theme, glass + glow) ----- */
+:root {
+  --bg-deep: #0a0c10;
+  --bg-card: rgba(18, 22, 30, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glow-cyan: #2ad4e3;
+  --glow-gold: #e6b84c;
+  --accent-1: #7b5ce7;
+  --accent-2: #3ccfcf;
+  --text-primary: #f0f3fa;
+  --text-secondary: #b4bccc;
+  --shadow-glow: 0 20px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(42, 212, 227, 0.3);
+  --transition-smooth: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  --font-heading: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(circle at 20% 10%, #1a1f2b, #070a0f 80%);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  line-height: 1.5;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* animated gradient canvas background */
+#particle-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(2px);
+}
+
+/* ----- glass + neumorphism cards ----- */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 2.5rem;
+  box-shadow: var(--shadow-glow), inset 0 0 30px rgba(255, 255, 255, 0.03);
+  transition: var(--transition-smooth);
+}
+
+.glass-card:hover {
+  border-color: rgba(42, 212, 227, 0.4);
+  box-shadow: 0 30px 45px rgba(0,0,0,0.7), 0 0 35px rgba(42, 212, 227, 0.4);
+  transform: translateY(-6px);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* typography */
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.section-title {
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  background: linear-gradient(135deg, #ffffff 0%, #bdd3ff 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 25px rgba(42,212,227,0.4);
+}
+
+/* buttons */
+.btn-glow {
+  padding: 0.9rem 2.4rem;
+  border-radius: 4rem;
+  font-weight: 600;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  cursor: pointer;
+  transition: 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(42,212,227,0.3), transparent);
+  transition: left 0.6s;
+}
+
+.btn-glow:hover::before {
+  left: 100%;
+}
+
+.btn-glow:hover {
+  border-color: var(--glow-cyan);
+  box-shadow: 0 0 30px var(--glow-cyan);
+  background: rgba(42, 212, 227, 0.1);
+}
+
+.btn-primary {
+  background: rgba(42, 212, 227, 0.15);
+  border-color: var(--glow-cyan);
+}
+
+/* ----- animated loader ----- */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: #06080c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.8s ease, visibility 0.8s;
+}
+.loader-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.spinner {
+  width: 70px;
+  height: 70px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top: 3px solid var(--glow-cyan);
+  border-radius: 50%;
+  animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  box-shadow: 0 0 25px var(--glow-cyan);
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(45px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* grid layouts */
+.grid-3, .grid-2 {
+  display: grid;
+  gap: 2rem;
+}
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+/* testimonial cards */
+.testimonial-card {
+  background: rgba(20, 25, 35, 0.7);
+  backdrop-filter: blur(14px);
+  border-radius: 2rem;
+  padding: 1.8rem;
+  border: 1px solid rgba(255,255,255,0.07);
+  transition: all 0.35s;
+}
+.testimonial-card:hover {
+  border-color: var(--glow-gold);
+  box-shadow: 0 0 30px rgba(230,184,76,0.25);
+}
+
+.star-rating {
+  color: #fbbf24;
+  letter-spacing: 3px;
+  font-size: 1.2rem;
+}
+
+/* responsive */
+@media (max-width: 640px) {
+  .container { padding: 0 1.2rem; }
+  .glass-card { border-radius: 2rem; }
+}

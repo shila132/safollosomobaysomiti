@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Safollo Savings • premium financial cooperative</title>
+  <!-- style embedded (single file delivery) -->
+  <style>
+    /* ----- CSS variables (premium dark theme, glass + glow) ----- */
+    :root {
+      --bg-deep: #0a0c10;
+      --bg-card: rgba(18, 22, 30, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glow-cyan: #2ad4e3;
+      --glow-gold: #e6b84c;
+      --accent-1: #7b5ce7;
+      --accent-2: #3ccfcf;
+      --text-primary: #f0f3fa;
+      --text-secondary: #b4bccc;
+      --shadow-glow: 0 20px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(42, 212, 227, 0.3);
+      --transition-smooth: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      --font-heading: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-body: 'Inter', 'Segoe UI', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 20% 10%, #1a1f2b, #070a0f 80%);
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      line-height: 1.5;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* animated gradient canvas background */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ----- glass + neumorphism cards ----- */
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 2.5rem;
+      box-shadow: var(--shadow-glow), inset 0 0 30px rgba(255, 255, 255, 0.03);
+      transition: var(--transition-smooth);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(42, 212, 227, 0.4);
+      box-shadow: 0 30px 45px rgba(0,0,0,0.7), 0 0 35px rgba(42, 212, 227, 0.4);
+      transform: translateY(-6px);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* typography */
+    h1, h2, h3 {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .section-title {
+      font-size: clamp(2.2rem, 6vw, 3.4rem);
+      background: linear-gradient(135deg, #ffffff 0%, #bdd3ff 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 25px rgba(42,212,227,0.4);
+    }
+
+    /* buttons */
+    .btn-glow {
+      padding: 0.9rem 2.4rem;
+      border-radius: 4rem;
+      font-weight: 600;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      cursor: pointer;
+      transition: 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-glow::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(42,212,227,0.3), transparent);
+      transition: left 0.6s;
+    }
+
+    .btn-glow:hover::before {
+      left: 100%;
+    }
+
+    .btn-glow:hover {
+      border-color: var(--glow-cyan);
+      box-shadow: 0 0 30px var(--glow-cyan);
+      background: rgba(42, 212, 227, 0.1);
+    }
+
+    .btn-primary {
+      background: rgba(42, 212, 227, 0.15);
+      border-color: var(--glow-cyan);
+    }
+
+    /* ----- animated loader ----- */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #06080c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s;
+    }
+    .loader-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .spinner {
+      width: 70px;
+      height: 70px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top: 3px solid var(--glow-cyan);
+      border-radius: 50%;
+      animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+      box-shadow: 0 0 25px var(--glow-cyan);
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* reveal animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(45px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* grid layouts */
+    .grid-3, .grid-2 {
+      display: grid;
+      gap: 2rem;
+    }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+    /* testimonial cards */
+    .testimonial-card {
+      background: rgba(20, 25, 35, 0.7);
+      backdrop-filter: blur(14px);
+      border-radius: 2rem;
+      padding: 1.8rem;
+      border: 1px solid rgba(255,255,255,0.07);
+      transition: all 0.35s;
+    }
+    .testimonial-card:hover {
+      border-color: var(--glow-gold);
+      box-shadow: 0 0 30px rgba(230,184,76,0.25);
+    }
+
+    .star-rating {
+      color: #fbbf24;
+      letter-spacing: 3px;
+      font-size: 1.2rem;
+    }
+
+    /* responsive */
+    @media (max-width: 640px) {
+      .container { padding: 0 1.2rem; }
+      .glass-card { border-radius: 2rem; }
+    }
+  </style>
+  <!-- Preload font for luxury look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Loading screen -->
+  <div id="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- animated particle canvas -->
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="content">
+    <!-- Hero Section -->
+    <header class="hero container" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding-top: 4rem;">
+      <div class="reveal" style="max-width: 950px;">
+        <h1 style="font-size: clamp(3rem, 10vw, 5.3rem); font-weight: 700; line-height: 1.1; background: linear-gradient(to right, #e0f0ff, #b0e0ff, #f0e68c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem;">
+          Safollo Savings and Loan Cooperative Society Ltd
+        </h1>
+        <p style="font-size: 1.4rem; color: #cbd5e1; margin-bottom: 2.5rem; letter-spacing: 0.3px;">
+          Empowering Financial Stability Through Trust, Transparency & Innovation
+        </p>
+        <div class="btn-group" style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+          <button class="btn-glow btn-primary" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">✨ Explore Services</button>
+          <button class="btn-glow" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">📞 Contact Us</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="container reveal" style="margin: 6rem auto;">
+      <h2 class="section-title">About Our Organization</h2>
+      <div class="glass-card" style="padding: 3rem;">
+        <p style="font-size: 1.2rem; color: #d1d9e6; margin-bottom: 2rem;">
+          Safollo Savings and Loan Cooperative Society Ltd is a government-registered financial organization (Registration No: 48) established on December 17, 2018. 
+          With Association ID: 5594100522, our headquarters in Shantinagar, Thakurgaon Sadar, Rangpur Division, we serve over <strong style="color: #fbbf24;">400,000+ satisfied members</strong>.
+        </p>
+        <p style="color: #b9c2d4; margin-bottom: 1.8rem;">
+          We prioritize security, zero fraud tolerance, and digital accountability. In 2023, we launched an advanced online platform and mobile app for seamless savings & loan management.
+        </p>
+        <div style="display: flex; gap: 2rem; flex-wrap: wrap; color: #9aa4b8;">
+          <span>📅 Established: 17 Dec 2018</span>
+          <span>🆔 Reg No: 48</span>
+          <span>📍 Rangpur Division</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Statistics counters -->
+    <section class="container reveal grid-3" style="margin: 5rem auto;">
+      <div class="glass-card" style="padding: 2rem; text-align: center;">
+        <div class="counter" data-target="400000" style="font-size: 2.8rem; font-weight: 700; color: #facc15;">0</div>
+        <p>Happy Members</p>
+      </div>
+      <div class="glass-card" style="padding: 2rem; text-align: center;">
+        <div style="font-size: 2.8rem; font-weight: 700; color: #2ad4e3;">100%</div>
+        <p>Risk-Free & Transparent</p>
+      </div>
+      <div class="glass-card" style="padding: 2rem; text-align: center;">
+        <div style="font-size: 2.8rem; font-weight: 700; color: #a78bfa;">48</div>
+        <p>Registration No</p>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="container reveal" style="margin: 6rem auto;">
+      <h2 class="section-title">Premium Services</h2>
+      <div class="grid-3">
+        <div class="glass-card" style="padding: 2rem;"><h3>💰 Savings Management</h3><p style="color: #b9c2d4;">Secure digital savings with attractive returns.</p></div>
+        <div class="glass-card" style="padding: 2rem;"><h3>🏦 Loan Services</h3><p style="color: #b9c2d4;">Quick loans with minimal interest.</p></div>
+        <div class="glass-card" style="padding: 2rem;"><h3>📱 Mobile App Support</h3><p style="color: #b9c2d4;">Installment tracking via app.</p></div>
+        <div class="glass-card" style="padding: 2rem;"><h3>💻 Online Platform</h3><p style="color: #b9c2d4;">24/7 digital access.</p></div>
+        <div class="glass-card" style="padding: 2rem;"><h3>🔐 Secure Transactions</h3><p style="color: #b9c2d4;">End-to-end encrypted.</p></div>
+        <div class="glass-card" style="padding: 2rem;"><h3>📊 Digital Installment</h3><p style="color: #b9c2d4;">Transparent tracking.</p></div>
+      </div>
+    </section>
+
+    <!-- Digital Innovation 2023 -->
+    <section class="container reveal" style="margin: 5rem auto;">
+      <h2 class="section-title">Digital Innovation 2023</h2>
+      <div class="glass-card" style="padding: 2.5rem; display: flex; flex-wrap: wrap; gap: 2rem; align-items: center;">
+        <div style="flex:1;">✨ Online loan & savings system<br>📲 Mobile app integration<br>⚡ Fast installment tracking</div>
+        <div style="flex:1; background: rgba(42,212,227,0.08); border-radius: 2rem; padding: 2rem;">Futuristic mockup interface</div>
+      </div>
+    </section>
+
+    <!-- Trust & Security -->
+    <section class="container reveal" style="margin: 5rem auto;">
+      <h2 class="section-title">Trust & Security</h2>
+      <div class="grid-2">
+        <div class="glass-card" style="padding: 2rem;">🛡️ Legal Compliance</div>
+        <div class="glass-card" style="padding: 2rem;">🔒 Risk-Free Operations</div>
+        <div class="glass-card" style="padding: 2rem;">🤝 Member Trust</div>
+        <div class="glass-card" style="padding: 2rem;">✅ Secure Digital Process</div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="container reveal" style="margin: 6rem auto;">
+      <h2 class="section-title">Member Success Stories</h2>
+      <div class="grid-2" id="testimonialContainer">
+        <!-- dynamically injected via JS for clean structure -->
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="container reveal" style="margin: 5rem auto;">
+      <h2 class="section-title">Contact Us</h2>
+      <div class="glass-card" style="padding: 3rem; max-width: 600px; margin:0 auto;">
+        <p>📞 WhatsApp: <strong>01754516028</strong></p>
+        <p>📍 Shantinagar, Thakurgaon Sadar, Rangpur</p>
+        <form style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+          <input type="text" placeholder="Your Name" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 1rem; border-radius: 2rem; color: white;">
+          <textarea placeholder="Message" rows="3" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 1rem; border-radius: 2rem; color: white;"></textarea>
+          <button class="btn-glow btn-primary" type="button" style="justify-content: center;">Send Message ✨</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="container" style="margin: 5rem auto 2rem; text-align: center; color: #7f8b9f; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2.5rem;">
+      <p>Safollo Savings and Loan Cooperative Society Ltd</p>
+      <p>© 2025 All rights reserved. | Rangpur, Bangladesh</p>
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+      // ----- LOADER -----
+      window.addEventListener('load', () => {
+        const loader = document.getElementById('loader');
+        setTimeout(() => {
+          loader.classList.add('loader-hidden');
+        }, 900);
+      });
+
+      // ----- CANVAS PARTICLES (animated background) -----
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = Math.random() * 2.2 + 0.8;
+          this.speedX = (Math.random() - 0.5) * 0.7;
+          this.speedY = (Math.random() - 0.5) * 0.7;
+          this.opacity = Math.random() * 0.5 + 0.15;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.x < 0 || this.x > width) this.speedX *= -1;
+          if (this.y < 0 || this.y > height) this.speedY *= -1;
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(42, 212, 227, ${this.opacity})`;
+          ctx.shadowColor = '#2ad4e3';
+          ctx.shadowBlur = 8;
+          ctx.fill();
+        }
+      }
+
+      function initParticles(count = 70) {
+        particles = [];
+        for (let i = 0; i < count; i++) {
+          particles.push(new Particle());
+        }
+      }
+      initParticles();
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+
+      // ----- COUNTER ANIMATION (Intersection Observer) -----
+      const counterElements = document.querySelectorAll('.counter');
+      const animateCounter = (el) => {
+        const target = +el.getAttribute('data-target');
+        if (!target || el.classList.contains('counted')) return;
+        el.classList.add('counted');
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+        const update = () => {
+          current += step;
+          if (current < target) {
+            el.textContent = Math.floor(current).toLocaleString() + '+';
+            requestAnimationFrame(update);
+          } else {
+            el.textContent = target.toLocaleString() + '+';
+          }
+        };
+        update();
+      };
+
+      // ----- SCROLL REVEAL (Intersection Observer) -----
+      const revealElements = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            // trigger counter if inside
+            const counter = entry.target.querySelector('.counter');
+            if (counter) animateCounter(counter);
+          }
+        });
+      }, { threshold: 0.2, rootMargin: "0px 0px -50px 0px" });
+
+      revealElements.forEach(el => observer.observe(el));
+
+      // Also observe counters directly if not wrapped in reveal
+      document.querySelectorAll('.counter').forEach(counter => {
+        const parentReveal = counter.closest('.reveal');
+        if (!parentReveal) {
+          const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) animateCounter(counter); });
+          }, { threshold: 0.5 });
+          counterObserver.observe(counter);
+        }
+      });
+
+      // ----- TESTIMONIAL DATA (mixed Bangla + Banglish, realistic) -----
+      const testimonials = [
+        { name: "Rahim Uddin", location: "Rangpur, Bangladesh", text: "আমি মাত্র ২৫ হাজার টাকা জামানত দিয়ে ৫ লক্ষ টাকা লোন নিয়েছি সাফল্য সমবায় সমিতি থেকে। খুব বিশ্বস্ত প্রতিষ্ঠান।", rating: 5 },
+        { name: "Sharmin Akter", location: "Dhaka, Bangladesh", text: "Alhamdulillah, process onek smooth chilo. Ami Khulna theke apply kore very fast approval paisi. সবাইকে recommend করবো।", rating: 5 },
+        { name: "Karim Mia", location: "Thakurgaon", text: "প্রথমে ভয় পেয়েছিলাম, কিন্তু সব কিছু legally & transparently complete হয়েছে। সত্যিই নিরাপদ।", rating: 5 },
+        { name: "Nasima Begum", location: "Chattogram", text: "Dhaka theke online e installment dite partasi — very helpful system. সময় মত লোন পেয়েছি।", rating: 5 },
+        { name: "Sohag Hossain", location: "Khulna", text: "আমি ছোট ব্যবসার জন্য লোন নিয়েছিলাম, এখন business অনেক ভালো চলছে। Safollo Somobay Somiti trusted।", rating: 5 },
+        { name: "Jannatul Ferdous", location: "Rangpur", text: "Safollo Somobay Somiti amar life change kore dise. Ami sobai ke bolbo Safollo theke loan nite.", rating: 5 },
+        { name: "Rafiq Islam", location: "Dinajpur", text: "Customer support onek bhalo chilo, WhatsApp e sob help paisi. খুব দ্রুত service।", rating: 4 },
+        { name: "Momena Khatun", location: "Bogura", text: "আমি আগে অন্য জায়গায় প্রতারিত হয়েছিলাম, কিন্তু এখানে সবকিছু secure and trusted লেগেছে। thank you Safollo.", rating: 5 },
+        { name: "Tanvir Ahmed", location: "Sylhet", text: "Sottiei Safollo Somobay Somitir loan onek valo, Kom interest, shudhu oder joma ta beshi dite hoy loan er age baki sob perfect.", rating: 5 },
+        { name: "Halima Akhter", location: "Rajshahi", text: "৪ লাখের বেশি happy member dekhe confidence peyechilam. eijonnoi tader ke orgim taka diye loan nichi. kintu interesting fact hocche ami abar joma takao ferot paichi।", rating: 5 }
+      ];
+
+      const container = document.getElementById('testimonialContainer');
+      function renderTestimonials() {
+        if (!container) return;
+        container.innerHTML = testimonials.map(t => `
+          <div class="testimonial-card reveal">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+              <div style="width: 50px; height: 50px; background: linear-gradient(145deg, #2ad4e3, #7b5ce7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">${t.name.charAt(0)}</div>
+              <div>
+                <h4 style="margin:0;">${t.name}</h4>
+                <small style="color:#a0afc7;">${t.location}</small>
+              </div>
+            </div>
+            <div class="star-rating">${'★'.repeat(t.rating)}</div>
+            <p style="margin-top: 0.8rem; font-style: italic; color: #e2e8f0;">“${t.text}”</p>
+          </div>
+        `).join('');
+        // re-observe newly added reveals
+        document.querySelectorAll('.testimonial-card.reveal').forEach(el => observer.observe(el));
+      }
+      renderTestimonials();
+
+      // Additional ripple effect for buttons
+      document.querySelectorAll('.btn-glow').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          const ripple = document.createElement('span');
+          ripple.style.position = 'absolute';
+          ripple.style.borderRadius = '50%';
+          ripple.style.background = 'rgba(255,255,255,0.3)';
+          ripple.style.width = '20px';
+          ripple.style.height = '20px';
+          ripple.style.left = `${e.clientX - btn.getBoundingClientRect().left - 10}px`;
+          ripple.style.top = `${e.clientY - btn.getBoundingClientRect().top - 10}px`;
+          ripple.style.animation = 'ripple 0.6s linear';
+          ripple.style.pointerEvents = 'none';
+          btn.appendChild(ripple);
+          setTimeout(() => ripple.remove(), 600);
+        });
+      });
+
+      // inject ripple keyframe dynamically
+      const styleSheet = document.createElement("style");
+      styleSheet.textContent = `@keyframes ripple { to { transform: scale(4); opacity:0; } }`;
+      document.head.appendChild(styleSheet);
+    })();
+  </script>
+</body>
+</html>
